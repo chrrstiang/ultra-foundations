@@ -6,15 +6,16 @@
 template <typename T> class RingBuffer {
 
 public:
-  std::unique_ptr<T[]> data;
-  int head;
-  int tail;
-  int capacity;
-  int count;
-
   // constructor
-  RingBuffer(int head, int capacity)
-      : data(new T[capacity]), head(0), tail(0), capacity(capacity), count(0) {}
+  RingBuffer(int capacity)
+      : data(new T[capacity]), head(0), tail(0), capacity(capacity), count(0) {
+    static_assert(std::is_arithmetic_v<T>,
+                  "Ring Buffer only supports numerical types.");
+
+    if (capacity <= 0) {
+      throw std::invalid_argument("Capacity must be a postive number.");
+    }
+  }
 
   // deconstructor (cleans up resources owned by object on deletion)
   ~RingBuffer() {}
@@ -25,24 +26,24 @@ public:
    */
   void push(T element) {
     // update tail & count
-    if (this->is_full()) {
-      if (this->tail == this->capacity - 1) {
-        this->tail = 0;
+    if (is_full()) {
+      if (wrapAround(tail)) {
+        tail = 0;
       } else {
-        this->tail++;
+        tail++;
       }
     } else {
-      this->count++;
+      count++;
     }
 
-    this->data[head] = element;
+    data[head] = element;
 
     // updating head
-    if (this->head == this->capacity - 1) {
-      this->head = 0;
+    if (wrapAround(head)) {
+      head = 0;
       return;
     } else {
-      this->head++;
+      head++;
     }
   }
 
@@ -51,31 +52,67 @@ public:
    * accordingly.
    */
   std::optional<T> pop() {
-    if (this->is_empty()) {
+    if (is_empty()) {
       return std::nullopt;
     }
 
-    T element = this->data[tail];
+    T element = data[tail];
 
-    if (this->tail == this->capacity - 1) {
-      this->tail = 0;
+    if (wrapAround(tail)) {
+      tail = 0;
     } else {
-      this->tail++;
+      tail++;
     }
 
-    this->count--;
+    count--;
     return element;
   }
 
   // read element at index without popping from buffer
-  T peek(int index) { return this->data[index]; }
+  std::optional<T> peek(int index) {
+    if (index >= 0 && index < capacity) {
+      return data[index];
+    } else {
+      return std::nullopt;
+    }
+  }
 
   // is buffer full or not
-  bool is_full() { return this->count == this->capacity; }
+  bool is_full() { return count == capacity; }
 
   // check if buffer is completely empty
-  bool is_empty() { return this->count == 0; }
+  bool is_empty() { return count == 0; }
 
   // gets average of the elements in buffer
-  int moving_average() {}
+  T moving_average() {
+    if (count == 0) {
+      return 0;
+    }
+
+    T average = 0;
+    int el_count = 0;
+    int i = tail;
+
+    while (el_count < count) {
+      average += data[i];
+      el_count++;
+      if (wrapAround(i)) {
+        i = 0;
+      } else {
+        i++;
+      }
+    }
+
+    return average / count;
+  }
+
+private:
+  std::unique_ptr<T[]> data;
+  int head;
+  int tail;
+  size_t capacity;
+  int count;
+  // determines whether the index is about to wrap around to the beginning of
+  // the buffer
+  bool wrapAround(int index) { return (index + 1) % capacity == 0; }
 };
