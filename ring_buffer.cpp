@@ -1,3 +1,9 @@
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <stdexcept>
+#include <type_traits>
+
 /**
  * RingBuffer acts as a ring buffer, FIFO type of data structure that rewmoves
  * old data for new data in order to keep memory usage low and recyclability

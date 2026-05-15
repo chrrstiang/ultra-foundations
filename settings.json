@@ -2,5 +2,9 @@
 "[cpp]": {
      "editor.defaultFormatter": "ms-vscode.cpptools"
    },
-   "C_Cpp.clang_format_style": "file"
+   "C_Cpp.clang_format_style": "file",
+   "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/build/_deps/googletest-src/googletest/include"
+    ]
 }
