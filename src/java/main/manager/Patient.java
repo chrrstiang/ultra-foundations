@@ -1,6 +1,6 @@
 package manager;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  *  Patient class containing patient information for sessions of ultrasound.
@@ -8,10 +8,10 @@ import java.util.Date;
 public class Patient {
     private final String firstName;
     private final String lastName;
-    private final Date dateOfBirth;
+    private final LocalDate dateOfBirth;
     private final int hospitalId;
 
-    Patient(String firstName, String lastName, Date dateOfBirth, int hospitalId) {
+    Patient(String firstName, String lastName, LocalDate dateOfBirth, int hospitalId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -26,7 +26,7 @@ public class Patient {
         return this.lastName;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return this.dateOfBirth;
     }
 
