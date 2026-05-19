@@ -8,20 +8,22 @@ public class ScanSession {
     private final Patient patient;
     private Frame[] imageSequence;
     State state;
+    ScanConfiguration config;
 
-    ScanSession(Patient p, Frame[] f, State s) {
+    public ScanSession(Patient p, Frame[] f, ScanConfiguration c) {
         this.patient = p;
         this.imageSequence = f;
-        this.state = s;
+        this.state = State.CREATED;
+        this.config = c;
     }
 
-    // validates and adds a frame to the image sequence
-    public void addFrame() {
+    // validates and adds a frame to the image sequence depending on the current state
+    public void addFrame(Frame frame) {
 
     }
 
-    // begins the session
-    public void begin() {
+    // switches the state of the session
+    public void switchState() {
 
     }
 

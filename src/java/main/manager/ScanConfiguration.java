@@ -10,14 +10,14 @@ public class ScanConfiguration {
     private float gain;
     private boolean harmonicMode;
 
-    ScanConfiguration(ConfigurationBuilder builder) {
+    public ScanConfiguration(ConfigurationBuilder builder) {
         this.imageDepth = builder.imageDepth;
         this.frequency = builder.frequency;
         this.gain = builder.gain;
         this.harmonicMode = builder.harmonicMode;
     }
 
-    static class ConfigurationBuilder {
+    public static class ConfigurationBuilder {
         private float imageDepth;
         private float frequency;
         private float gain;
@@ -27,22 +27,22 @@ public class ScanConfiguration {
             return new ConfigurationBuilder();
         }
 
-        private ConfigurationBuilder setImageDepth(float d) {
+        public ConfigurationBuilder setImageDepth(float d) {
             this.imageDepth = d;
             return this;
         }
 
-        private ConfigurationBuilder setFrequency(float f) {
+        public ConfigurationBuilder setFrequency(float f) {
             this.frequency = f;
             return this;
         }
 
-        private ConfigurationBuilder setGain(float g) {
+        public ConfigurationBuilder setGain(float g) {
             this.gain = g;
             return this;
         }
 
-        private ConfigurationBuilder setHarmonicMode(boolean harmonicMode) {
+        public ConfigurationBuilder setHarmonicMode(boolean harmonicMode) {
             this.harmonicMode = harmonicMode;
             return this;
         }

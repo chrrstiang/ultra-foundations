@@ -1,4 +1,6 @@
 build/
+out/
+*.class
 
 .idea/workspace.xml
 .idea/tasks.xml

@@ -10,13 +10,11 @@ public class Frame {
     private float[] pixelData;
     private final LocalDateTime timestamp;
     int index;
-    ScanConfiguration settings;
 
-    Frame(float[] pixelData, LocalDateTime timestamp, int index, ScanConfiguration settings) {
+    public Frame(float[] pixelData, int index) {
         this.pixelData = pixelData;
-        this.timestamp = timestamp;
+        this.timestamp = LocalDateTime.now();
         this.index = index;
-        this.settings  = settings;
     }
 
     // average intensity of pixel data aka float averages

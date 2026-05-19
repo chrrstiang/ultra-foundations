@@ -11,11 +11,11 @@ public class Patient {
     private final LocalDate dateOfBirth;
     private final int hospitalId;
 
-    Patient(String firstName, String lastName, LocalDate dateOfBirth, int hospitalId) {
+    public Patient(String firstName, String lastName, LocalDate dateOfBirth) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.hospitalId = hospitalId;
+        this.hospitalId = 10;
     }
 
     public String getFirstName() {
