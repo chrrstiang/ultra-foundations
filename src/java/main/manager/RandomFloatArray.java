@@ -1,3 +1,5 @@
+package manager;
+
 import java.util.Random;
 
 public class RandomFloatArray {

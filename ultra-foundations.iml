@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
-    <exclude-output />
-    <content url="file://$MODULE_DIR$">
+  <component name="AdditionalModuleElements">
+    <content url="file://$MODULE_DIR$" dumb="true">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/manager" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/java/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/java/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/.vscode" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/src/cpp" />
       <excludeFolder url="file://$MODULE_DIR$/tests" />
     </content>
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

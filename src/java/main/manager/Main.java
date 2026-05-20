@@ -1,7 +1,4 @@
-import manager.Frame;
-import manager.Patient;
-import manager.ScanConfiguration;
-import manager.ScanSession;
+package manager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,7 +6,7 @@ import java.util.Scanner;
 import java.util.concurrent.*;
 
 /**
- * Main class allows interaction with application through terminal
+ * manager.Main class allows interaction with application through terminal
  * Simulates ultrasound scan.
  */
 public class Main {

@@ -5,8 +5,8 @@ package manager;
  * image sequences, current state.
  */
 public class ScanSession {
-    private final Patient patient;
-    private Frame[] imageSequence;
+    final Patient patient;
+    Frame[] imageSequence;
     State state;
     ScanConfiguration config;
 

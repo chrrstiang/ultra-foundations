@@ -1,4 +1,4 @@
-import manager.Frame;
+package manager;
 
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
