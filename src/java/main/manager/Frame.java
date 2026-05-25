@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
  * ultrasound scan session.
  */
 public class Frame {
-    private float[] pixelData;
-    private final LocalDateTime timestamp;
+    float[] pixelData;
+    final LocalDateTime timestamp;
     int index;
 
     public Frame(float[] pixelData, int index) {

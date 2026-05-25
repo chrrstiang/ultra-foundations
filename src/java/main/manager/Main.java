@@ -11,10 +11,10 @@ import java.util.concurrent.*;
  */
 public class Main {
 
-    public static void main(String[] args) {
-        // inputs for Patient creation
+    public static void main(String[] args) throws InterruptedException {
         Scanner scanner = new Scanner(System.in);
 
+        // inputs for Patient creation
         System.out.print("What's your first name? ");
         String firstName = scanner.nextLine();
 
@@ -46,36 +46,58 @@ public class Main {
                 .setHarmonicMode(harmonicMode)
                 .build();
 
-        Frame[] frames = new Frame[0];
-        ScanSession session = new ScanSession(p, frames, config);
+        ScanSession session = new ScanSession(p, new Frame[0], config);
 
-        scanner.close();
+        // wait for Enter to start
+        System.out.println("Press Enter to start the scan...");
+        scanner.nextLine();
 
-        ArrayList<CompletableFuture<Frame>> completableFutures = new ArrayList<CompletableFuture<Frame>>();
-        ExecutorService exec = Executors.newFixedThreadPool(5);
+        session.switchState(); // CREATED -> STARTED
+        session.switchState(); // STARTED -> ACTIVE
+        System.out.println("Scan active. Press 's' for summary, 'q' to stop.");
 
-        for (int i = 0; i < 5; i++) {
-            float[] arr = new RandomFloatArray(10).getData();
+        // frame generation thread — preserves existing CompletableFuture batch pattern
+        Thread frameThread = new Thread(() -> {
+            int index = 0;
+            ExecutorService exec = Executors.newFixedThreadPool(5);
+            while (session.state == State.ACTIVE) {
+                ArrayList<CompletableFuture<Frame>> futures = new ArrayList<>();
+                for (int i = 0; i < 5; i++) {
+                    float[] arr = new RandomFloatArray(10).getData();
+                    futures.add(CompletableFuture.supplyAsync(new Task(arr, index + i), exec));
+                }
+                index += 5;
+                CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
+                for (CompletableFuture<Frame> fut : futures) {
+                    try {
+                        session.addFrame(fut.get());
+                    } catch (CancellationException | InterruptedException | ExecutionException e) {
+                        exec.shutdown();
+                        return;
+                    }
+                }
+            }
+            exec.shutdown();
+        });
+        frameThread.setDaemon(true);
+        frameThread.start();
 
-            CompletableFuture<Frame> future = CompletableFuture.supplyAsync(new Task(arr, i), exec);
-
-            completableFutures.add(future);
-        }
-
-        // wait for the all threads to finish completing tasks
-        CompletableFuture.allOf(completableFutures.toArray(CompletableFuture[]::new)).join();
-
-        for (CompletableFuture<Frame> fut : completableFutures ) {
-            try {
-                Frame frame = fut.get();
-                session.addFrame(frame);
-            } catch (CancellationException | InterruptedException | ExecutionException c) {
-                System.out.print("Error fetching frame from future; exiting");
-                return;
+        // input loop — controls session lifecycle
+        while (true) {
+            String input = scanner.nextLine().trim();
+            if (input.equals("s") && session.state == State.ACTIVE) {
+                session.summary();
+            } else if (input.equals("q") && session.state == State.ACTIVE) {
+                session.switchState(); // ACTIVE -> STOPPED
+                System.out.println("Scan stopped. Press 'q' to finalize.");
+            } else if (input.equals("q") && session.state == State.STOPPED) {
+                session.switchState(); // STOPPED -> FINALIZED
+                frameThread.join();
+                session.summary();
+                break;
             }
         }
 
-
-
+        scanner.close();
     }
 }

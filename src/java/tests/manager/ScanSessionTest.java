@@ -50,7 +50,9 @@ public class ScanSessionTest {
     // --- addFrame ---
 
     @Test
-    void addFrame_appendsFrameToImageSequence() {
+    void addFrame_appendsFrameWhenActive() {
+        session.switchState(); // CREATED -> STARTED
+        session.switchState(); // STARTED -> ACTIVE
         Frame frame = new Frame(new float[]{0.1f, 0.5f, 0.9f}, 0);
         session.addFrame(frame);
         assertEquals(1, session.imageSequence.length);
@@ -58,16 +60,10 @@ public class ScanSessionTest {
     }
 
     @Test
-    void addFrame_doesNotAddFrameWhenFinalized() {
-        // advance to FINALIZED
-        session.switchState(); // CREATED -> STARTED
-        session.switchState(); // STARTED -> ACTIVE
-        session.switchState(); // ACTIVE  -> STOPPED
-        session.switchState(); // STOPPED -> FINALIZED
-
+    void addFrame_throwsWhenNotActive() {
+        // session is in CREATED state — not ACTIVE
         Frame frame = new Frame(new float[]{0.2f, 0.4f}, 1);
-        session.addFrame(frame);
-        assertEquals(0, session.imageSequence.length);
+        assertThrows(IllegalStateException.class, () -> session.addFrame(frame));
     }
 
     // --- switchState ---

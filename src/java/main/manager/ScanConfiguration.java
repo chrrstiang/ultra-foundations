@@ -5,10 +5,10 @@ package manager;
  * that the ultrasound scan uses for imaging.
  */
 public class ScanConfiguration {
-    private float imageDepth;
-    private float frequency;
-    private float gain;
-    private boolean harmonicMode;
+    float imageDepth;
+    float frequency;
+    float gain;
+    boolean harmonicMode;
 
     public ScanConfiguration(ConfigurationBuilder builder) {
         this.imageDepth = builder.imageDepth;
