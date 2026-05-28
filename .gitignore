@@ -1,8 +1,12 @@
 build/
 out/
+target/
 *.class
 
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/shelf/
 .idea/dictionaries/
+.idea/compiler.xml
+.idea/encodings.xml
+.idea/jarRepositories.xml
