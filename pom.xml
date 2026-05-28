@@ -29,18 +29,12 @@
         <testSourceDirectory>src/java/tests</testSourceDirectory>
         <resources>
             <resource>
-                <directory>src/java/main</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
+                <directory>src/java/main/resources</directory>
             </resource>
         </resources>
         <testResources>
             <testResource>
-                <directory>src/java/tests</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
+                <directory>src/java/tests/resources</directory>
             </testResource>
         </testResources>
         <plugins>

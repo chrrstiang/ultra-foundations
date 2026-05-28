@@ -28,7 +28,7 @@ public class ScanSession {
      * @param frame The frame being added to the imageSequence of this ScanSession
      */
     public void addFrame(Frame frame) {
-        if (state != State.ACTIVE) {
+        if (state != State.ACTIVE && state != State.STOPPED) {
             throw new IllegalStateException("Cannot add an image frame while session is not active.");
         }
         imageSequence = Arrays.copyOf(imageSequence, imageSequence.length + 1);

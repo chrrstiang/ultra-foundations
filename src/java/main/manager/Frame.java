@@ -19,12 +19,11 @@ public class Frame {
 
     // average intensity of pixel data aka float averages
     public float averageIntensity() {
-        return 1;
-    }
-
-    // determines if an image frame is corrupted
-    boolean isCorrupted() {
-        return false;
+        float sum = 0;
+        for (float f : pixelData) {
+            sum += f;
+        }
+        return sum / pixelData.length;
     }
 
 }
