@@ -11,4 +11,5 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_subdirectory(tests)
+enable_testing()
+add_subdirectory(src/cpp/tests)
