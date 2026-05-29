@@ -5,7 +5,7 @@
 #include <type_traits>
 
 /**
- * RingBuffer acts as a ring buffer, FIFO type of data structure that rewmoves
+ * RingBuffer acts as a ring buffer, FIFO type of data structure that removes
  * old data for new data in order to keep memory usage low and recyclability
  * high.
  */

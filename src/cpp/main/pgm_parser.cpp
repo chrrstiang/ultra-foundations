@@ -1,0 +1,57 @@
+#include "image.cpp"
+#include <fstream>
+#include <ios>
+#include <limits>
+#include <stdexcept>
+#include <string>
+
+class PGM_Parser {
+private:
+  std::ifstream file;
+
+  void skip_comments() {
+    while (file >> std::ws && file.peek() == '#') {
+      std::string dummy;
+      std::getline(file, dummy);
+    }
+  }
+
+public:
+  PGM_Parser(const std::string &filepath) : file(filepath, std::ios::binary) {}
+
+  /**
+   * parses the PGM file and returns an Image object corresponding to the PGM
+   * file
+   */
+  Image parse() {
+    if (!file) {
+      throw std::runtime_error("Cannot open file.");
+    }
+
+    std::string magic;
+    file >> magic;
+
+    int width;
+    int height;
+    std::vector<float> pixelData;
+
+    skip_comments();
+    file >> width;
+
+    skip_comments();
+    file >> height;
+
+    skip_comments();
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    pixelData.resize(width * height);
+
+    for (int i = 0; i < width * height; i++) {
+      unsigned char byte;
+      file.read(reinterpret_cast<char *>(&byte), 1);
+      pixelData[i] = static_cast<float>(byte);
+    }
+
+    return Image(height, width, pixelData);
+  }
+};
