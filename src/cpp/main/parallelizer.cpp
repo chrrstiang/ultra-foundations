@@ -9,9 +9,10 @@
  * neighbor data during convolution. Strips are processed concurrently via
  * std::async, ghost rows are trimmed from results, and strips are recombined.
  *
- * Note: filters with global state (e.g. IntensityNormalization) will compute
- * per-strip min/max rather than global min/max, so results may differ slightly
- * from sequential execution.
+ * Before slicing, a serial pass calls prepare() on each filter with the full
+ * image. Filters that require global image state (e.g. IntensityNormalization)
+ * override prepare() to compute and store that state, ensuring results are
+ * consistent with sequential execution.
  */
 Parallelizer::Parallelizer(std::vector<std::unique_ptr<Filter>> &filters,
                            Image image)
@@ -21,6 +22,11 @@ Image Parallelizer::execute() {
   int height = image.getHeight();
   int numStrips = std::min((int)std::thread::hardware_concurrency(), height);
   if (numStrips < 1) numStrips = 1;
+
+  // serial pass: allow each filter to compute global state from the full image
+  for (auto &f : filters) {
+    f->prepare(image);
+  }
 
   int baseRows = height / numStrips;
   int remainder = height % numStrips;
@@ -59,8 +65,8 @@ Image Parallelizer::execute() {
     auto [startRow, endRow] = strips[i];
 
     int sliceStart = std::max(0, startRow - GHOST_ROWS);
-    int trimTop = startRow - sliceStart;   // rows to skip at top
-    int trimBottom = trimTop + (endRow - startRow); // last row to keep (exclusive)
+    int trimTop = startRow - sliceStart;
+    int trimBottom = trimTop + (endRow - startRow);
 
     results.push_back(filtered.slice(trimTop, trimBottom));
   }
