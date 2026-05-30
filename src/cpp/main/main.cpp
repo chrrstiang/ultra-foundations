@@ -4,6 +4,7 @@
 #include "filters/sobel_edge_detection.h"
 #include "pgm_parser.h"
 #include "pgm_writer.h"
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -27,6 +28,8 @@ int main(int argc, char *argv[]) {
       .addFilter(std::make_unique<SobelEdgeDetection>())
       .addFilter(std::make_unique<IntensityNormalization>());
 
+  auto start = std::chrono::high_resolution_clock::now();
+
   // run filters
   Image result =
       parallel ? pipeline.executeParallel(image) : pipeline.execute(image);
@@ -35,7 +38,11 @@ int main(int argc, char *argv[]) {
   PGMWriter writer(result);
   writer.write(argv[2]);
 
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   std::cout << "Done (" << (parallel ? "parallel" : "sequential") << "). "
-            << "Output written to " << argv[2] << "\n";
+            << "Output written to " << argv[2] << "\n"
+            << duration.count() << "ms" << std::endl;
   return 0;
 }
