@@ -1,57 +1,48 @@
-#include "image.cpp"
-#include <fstream>
-#include <ios>
-#include <limits>
-#include <stdexcept>
-#include <string>
+#include "pgm_parser.h"
+#include <vector>
 
-class PGM_Parser {
-private:
-  std::ifstream file;
+PGM_Parser::PGM_Parser(const std::string &filepath)
+    : file(filepath, std::ios::binary) {}
 
-  void skip_comments() {
-    while (file >> std::ws && file.peek() == '#') {
-      std::string dummy;
-      std::getline(file, dummy);
-    }
+void PGM_Parser::skip_comments() {
+  while (file >> std::ws && file.peek() == '#') {
+    std::string dummy;
+    std::getline(file, dummy);
+  }
+}
+
+/**
+ * parses the PGM file and returns an Image object corresponding to the PGM
+ * file
+ */
+Image PGM_Parser::parse() {
+  if (!file) {
+    throw std::runtime_error("Cannot open file.");
   }
 
-public:
-  PGM_Parser(const std::string &filepath) : file(filepath, std::ios::binary) {}
+  std::string magic;
+  file >> magic;
 
-  /**
-   * parses the PGM file and returns an Image object corresponding to the PGM
-   * file
-   */
-  Image parse() {
-    if (!file) {
-      throw std::runtime_error("Cannot open file.");
-    }
+  int width;
+  int height;
+  std::vector<float> pixelData;
 
-    std::string magic;
-    file >> magic;
+  skip_comments();
+  file >> width;
 
-    int width;
-    int height;
-    std::vector<float> pixelData;
+  skip_comments();
+  file >> height;
 
-    skip_comments();
-    file >> width;
+  skip_comments();
+  file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    skip_comments();
-    file >> height;
+  pixelData.resize(width * height);
 
-    skip_comments();
-    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    pixelData.resize(width * height);
-
-    for (int i = 0; i < width * height; i++) {
-      unsigned char byte;
-      file.read(reinterpret_cast<char *>(&byte), 1);
-      pixelData[i] = static_cast<float>(byte);
-    }
-
-    return Image(height, width, pixelData);
+  for (int i = 0; i < width * height; i++) {
+    unsigned char byte;
+    file.read(reinterpret_cast<char *>(&byte), 1);
+    pixelData[i] = static_cast<float>(byte);
   }
-};
+
+  return Image(height, width, pixelData);
+}
