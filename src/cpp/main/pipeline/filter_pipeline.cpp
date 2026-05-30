@@ -1,5 +1,5 @@
 #include "filter_pipeline.h"
-#include "parallelizer.h"
+#include "../parallelizer/parallelizer.h"
 
 Pipeline::Pipeline() {}
 

@@ -13,15 +13,15 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(ultra-foundations
   src/cpp/main/main.cpp
-  src/cpp/main/image.cpp
-  src/cpp/main/pgm_parser.cpp
-  src/cpp/main/pgm_writer.cpp
-  src/cpp/main/filter_pipeline.cpp
+  src/cpp/main/image/image.cpp
+  src/cpp/main/parser/pgm_parser.cpp
+  src/cpp/main/writer/pgm_writer.cpp
+  src/cpp/main/pipeline/filter_pipeline.cpp
   src/cpp/main/filters/filter.cpp
   src/cpp/main/filters/gaussian.cpp
   src/cpp/main/filters/sobel_edge_detection.cpp
   src/cpp/main/filters/intensity_normalization.cpp
-  src/cpp/main/parallelizer.cpp
+  src/cpp/main/parallelizer/parallelizer.cpp
 )
 
 target_include_directories(ultra-foundations PRIVATE src/cpp/main)

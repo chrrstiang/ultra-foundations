@@ -1,4 +1,4 @@
-#include "../main/pgm_parser.h"
+#include "../main/parser/pgm_parser.h"
 #include <fstream>
 #include <gtest/gtest.h>
 #include <vector>

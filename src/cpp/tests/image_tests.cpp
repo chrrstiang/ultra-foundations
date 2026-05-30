@@ -1,4 +1,4 @@
-#include "../main/image.h"
+#include "../main/image/image.h"
 #include <gtest/gtest.h>
 #include <vector>
 

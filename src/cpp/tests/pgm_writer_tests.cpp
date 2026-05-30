@@ -1,5 +1,5 @@
-#include "../main/pgm_writer.h"
-#include "../main/pgm_parser.h"
+#include "../main/writer/pgm_writer.h"
+#include "../main/parser/pgm_parser.h"
 #include <gtest/gtest.h>
 #include <fstream>
 #include <vector>

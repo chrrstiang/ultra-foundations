@@ -1,9 +1,9 @@
-#include "filter_pipeline.h"
+#include "pipeline/filter_pipeline.h"
 #include "filters/gaussian.h"
 #include "filters/intensity_normalization.h"
 #include "filters/sobel_edge_detection.h"
-#include "pgm_parser.h"
-#include "pgm_writer.h"
+#include "parser/pgm_parser.h"
+#include "writer/pgm_writer.h"
 #include <chrono>
 #include <iostream>
 #include <memory>

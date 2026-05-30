@@ -1,6 +1,6 @@
 #pragma once
-#include "filters/filter.h"
-#include "image.h"
+#include "../filters/filter.h"
+#include "../image/image.h"
 #include <memory>
 #include <vector>
 

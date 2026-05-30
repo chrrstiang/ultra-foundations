@@ -1,4 +1,4 @@
-#include "../main/parallelizer.h"
+#include "../main/parallelizer/parallelizer.h"
 #include "../main/filters/gaussian.h"
 #include "../main/filters/intensity_normalization.h"
 #include "../main/filters/sobel_edge_detection.h"
