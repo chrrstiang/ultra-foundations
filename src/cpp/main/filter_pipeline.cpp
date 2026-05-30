@@ -1,4 +1,5 @@
 #include "filter_pipeline.h"
+#include "parallelizer.h"
 
 Pipeline::Pipeline() {}
 
@@ -14,4 +15,9 @@ Image Pipeline::execute(Image current_image) {
     current_image = ptr->apply(current_image);
   }
   return current_image;
+}
+
+Image Pipeline::executeParallel(Image image) {
+  Parallelizer p(filters, image);
+  return p.execute();
 }

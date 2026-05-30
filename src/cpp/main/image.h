@@ -8,6 +8,8 @@ public:
   void set(float value, int row, int col);
   int getHeight();
   int getWidth();
+  Image slice(int startRow, int endRow);
+  static Image combine(std::vector<Image> slices);
 
 private:
   int height;

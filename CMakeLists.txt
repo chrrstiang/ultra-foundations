@@ -21,6 +21,7 @@ add_executable(ultra-foundations
   src/cpp/main/filters/gaussian.cpp
   src/cpp/main/filters/sobel_edge_detection.cpp
   src/cpp/main/filters/intensity_normalization.cpp
+  src/cpp/main/parallelizer.cpp
 )
 
 target_include_directories(ultra-foundations PRIVATE src/cpp/main)

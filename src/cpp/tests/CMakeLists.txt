@@ -82,3 +82,33 @@ target_link_libraries(pgm_writer_tests
 )
 
 gtest_discover_tests(pgm_writer_tests)
+
+add_executable(image_tests
+  image_tests.cpp
+  ../main/image.cpp
+)
+
+target_include_directories(image_tests PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(image_tests
+  GTest::gtest_main
+)
+
+gtest_discover_tests(image_tests)
+
+add_executable(parallelizer_tests
+  parallelizer_tests.cpp
+  ../main/parallelizer.cpp
+  ../main/filters/gaussian.cpp
+  ../main/filters/sobel_edge_detection.cpp
+  ../main/filters/filter.cpp
+  ../main/image.cpp
+)
+
+target_include_directories(parallelizer_tests PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(parallelizer_tests
+  GTest::gtest_main
+)
+
+gtest_discover_tests(parallelizer_tests)

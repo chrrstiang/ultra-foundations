@@ -6,12 +6,16 @@
 #include "pgm_writer.h"
 #include <iostream>
 #include <memory>
+#include <string>
 
 int main(int argc, char *argv[]) {
   if (argc < 3) {
-    std::cerr << "Usage: " << argv[0] << " <baboon.ascii.pgm> <edited.pgm>\n";
+    std::cerr << "Usage: " << argv[0]
+              << " <input.pgm> <output.pgm> [--parallel]\n";
     return 1;
   }
+
+  bool parallel = (argc >= 4 && std::string(argv[3]) == "--parallel");
 
   // load image from disk
   PGM_Parser parser(argv[1]);
@@ -24,12 +28,14 @@ int main(int argc, char *argv[]) {
       .addFilter(std::make_unique<IntensityNormalization>());
 
   // run filters
-  Image result = pipeline.execute(image);
+  Image result =
+      parallel ? pipeline.executeParallel(image) : pipeline.execute(image);
 
   // write result to disk
   PGMWriter writer(result);
   writer.write(argv[2]);
 
-  std::cout << "Done. Output written to " << argv[2] << "\n";
+  std::cout << "Done (" << (parallel ? "parallel" : "sequential") << "). "
+            << "Output written to " << argv[2] << "\n";
   return 0;
 }

@@ -10,6 +10,7 @@ public:
   ~Pipeline();
   Pipeline &addFilter(std::unique_ptr<Filter> filter);
   Image execute(Image current_image);
+  Image executeParallel(Image image);
 
 private:
   std::vector<std::unique_ptr<Filter>> filters;
