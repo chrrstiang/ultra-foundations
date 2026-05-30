@@ -34,14 +34,24 @@ Image PGM_Parser::parse() {
   file >> height;
 
   skip_comments();
+  int maxVal;
+  file >> maxVal;
   file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
   pixelData.resize(width * height);
 
-  for (int i = 0; i < width * height; i++) {
-    unsigned char byte;
-    file.read(reinterpret_cast<char *>(&byte), 1);
-    pixelData[i] = static_cast<float>(byte);
+  if (magic == "P2") {
+    for (int i = 0; i < width * height; i++) {
+      int val;
+      file >> val;
+      pixelData[i] = static_cast<float>(val);
+    }
+  } else if (magic == "P5") {
+    for (int i = 0; i < width * height; i++) {
+      unsigned char byte;
+      file.read(reinterpret_cast<char *>(&byte), 1);
+      pixelData[i] = static_cast<float>(byte);
+    }
   }
 
   return Image(height, width, pixelData);

@@ -10,3 +10,6 @@ target/
 .idea/compiler.xml
 .idea/encodings.xml
 .idea/jarRepositories.xml
+
+# macOS
+.DS_Store
