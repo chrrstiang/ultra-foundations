@@ -10,15 +10,9 @@
 Image SobelEdgeDetection::apply(Image image) {
   // Sobel kernels
   const float Kx[3][3] = {
-      {-1.0f, 0.0f, 1.0f},
-      {-2.0f, 0.0f, 2.0f},
-      {-1.0f, 0.0f, 1.0f}
-  };
+      {-1.0f, 0.0f, 1.0f}, {-2.0f, 0.0f, 2.0f}, {-1.0f, 0.0f, 1.0f}};
   const float Ky[3][3] = {
-      {-1.0f, -2.0f, -1.0f},
-      { 0.0f,  0.0f,  0.0f},
-      { 1.0f,  2.0f,  1.0f}
-  };
+      {-1.0f, -2.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 2.0f, 1.0f}};
 
   int height = image.getHeight();
   int width = image.getWidth();
@@ -43,7 +37,8 @@ Image SobelEdgeDetection::apply(Image image) {
 
       float magnitude = std::sqrt(gx * gx + gy * gy);
       // clamp to [0, 255]
-      if (magnitude > 255.0f) magnitude = 255.0f;
+      if (magnitude > 255.0f)
+        magnitude = 255.0f;
       result.set(magnitude, r, c);
     }
   }

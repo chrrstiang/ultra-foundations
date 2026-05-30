@@ -9,10 +9,7 @@
 Image GaussianBlur::apply(Image image) {
   // 3x3 Gaussian kernel (sigma ~ 1.0), sum = 16
   const float kernel[3][3] = {
-      {1.0f, 2.0f, 1.0f},
-      {2.0f, 4.0f, 2.0f},
-      {1.0f, 2.0f, 1.0f}
-  };
+      {1.0f, 2.0f, 1.0f}, {2.0f, 4.0f, 2.0f}, {1.0f, 2.0f, 1.0f}};
   const float kernelSum = 16.0f;
 
   int height = image.getHeight();
