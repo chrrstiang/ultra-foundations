@@ -15,13 +15,10 @@ template <typename T> class RingBuffer {
 public:
   // constructor
   RingBuffer(int capacity)
-      : data(new T[capacity]), head(0), tail(0), capacity(capacity), count(0) {
+      : data(new T[checkCapacity(capacity)]), head(0), tail(0),
+        capacity(capacity), count(0) {
     static_assert(std::is_arithmetic_v<T>,
                   "Ring Buffer only supports numerical types.");
-
-    if (capacity <= 0) {
-      throw std::invalid_argument("Capacity must be a postive number.");
-    }
   }
 
   // deconstructor (cleans up resources owned by object on deletion)
@@ -114,6 +111,13 @@ public:
   }
 
 private:
+  static int checkCapacity(int cap) {
+    if (cap <= 0) {
+      throw std::invalid_argument("Capacity must be a positive number.");
+    }
+    return cap;
+  }
+
   std::unique_ptr<T[]> data;
   int head;
   int tail;

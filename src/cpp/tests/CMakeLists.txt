@@ -101,6 +101,7 @@ add_executable(parallelizer_tests
   ../main/parallelizer.cpp
   ../main/filters/gaussian.cpp
   ../main/filters/sobel_edge_detection.cpp
+  ../main/filters/intensity_normalization.cpp
   ../main/filters/filter.cpp
   ../main/image.cpp
 )

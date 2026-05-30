@@ -21,7 +21,9 @@ Image PGM_Parser::parse() {
   }
 
   std::string magic;
-  file >> magic;
+  if (!(file >> magic)) {
+    throw std::runtime_error("Failed to read PGM header: file is empty or unreadable.");
+  }
 
   int width;
   int height;

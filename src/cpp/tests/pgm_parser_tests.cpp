@@ -6,16 +6,19 @@
 /** Test Cases:
  *
  * FileHandling__Test:
- * - InvalidPath: nonexistent file throws runtime_error
+ * - InvalidPath [failure]: nonexistent file throws runtime_error
+ * - EmptyFile [failure]: file exists but is empty throws runtime_error
  *
  * Parse__Test:
- * - PixelValues: known byte values are parsed correctly
- * - CommentsInHeader: comment lines are skipped correctly
- * - SinglePixel: 1x1 image parses correctly
+ * - PixelValues [success]: known byte values are parsed correctly
+ * - CommentsInHeader [success]: a comment line before dimensions is skipped
+ * - SinglePixel [success]: 1x1 image parses correctly
+ * - DimensionsCorrect [success]: parsed image has correct width and height
+ * - MultipleComments [edge]: multiple comment lines before each header field are all skipped
  *
  * Image__Test:
- * - AtRowCol: at() maps row/col to correct pixel
- * - SetRowCol: set() updates correct pixel
+ * - AtRowCol [success]: at() maps row/col to correct pixel
+ * - SetRowCol [success]: set() updates correct pixel
  */
 
 // Writes a minimal valid P5 PGM file and returns the path.
@@ -36,6 +39,13 @@ static std::string write_temp_pgm(const std::string &path, int w, int h,
 
 TEST(FileHandling__Test, InvalidPath) {
   PGM_Parser parser("/nonexistent/path/file.pgm");
+  EXPECT_THROW(parser.parse(), std::runtime_error);
+}
+
+TEST(FileHandling__Test, EmptyFile) {
+  // create an empty file then try to parse it
+  { std::ofstream f("/tmp/test_empty.pgm"); }
+  PGM_Parser parser("/tmp/test_empty.pgm");
   EXPECT_THROW(parser.parse(), std::runtime_error);
 }
 
@@ -75,6 +85,40 @@ TEST(Parse__Test, SinglePixel) {
   Image img = parser.parse();
 
   EXPECT_EQ(img.at(0, 0), 255.0f);
+}
+
+TEST(Parse__Test, DimensionsCorrect) {
+  std::vector<unsigned char> pixels(3 * 4, 0);
+  write_temp_pgm("/tmp/test_dims.pgm", 4, 3, pixels);
+
+  PGM_Parser parser("/tmp/test_dims.pgm");
+  Image img = parser.parse();
+
+  EXPECT_EQ(img.getWidth(), 4);
+  EXPECT_EQ(img.getHeight(), 3);
+}
+
+TEST(Parse__Test, MultipleComments) {
+  // write a PGM file with multiple comment lines before each header field
+  {
+    std::ofstream f("/tmp/test_multicomment.pgm", std::ios::binary);
+    f << "P5\n";
+    f << "# comment 1\n";
+    f << "# comment 2\n";
+    f << "2 2\n";
+    f << "# comment before maxval\n";
+    f << "255\n";
+    unsigned char pixels[] = {10, 20, 30, 40};
+    f.write(reinterpret_cast<const char *>(pixels), 4);
+  }
+
+  PGM_Parser parser("/tmp/test_multicomment.pgm");
+  Image img = parser.parse();
+
+  EXPECT_EQ(img.at(0, 0), 10.0f);
+  EXPECT_EQ(img.at(0, 1), 20.0f);
+  EXPECT_EQ(img.at(1, 0), 30.0f);
+  EXPECT_EQ(img.at(1, 1), 40.0f);
 }
 
 // --- Image__Test ---

@@ -1,4 +1,5 @@
 #include "image.h"
+#include <stdexcept>
 
 Image::Image(int height, int width, std::vector<float> pixelData)
     : height(height), width(width), pixelData(std::move(pixelData)) {}
@@ -14,6 +15,13 @@ int Image::getHeight() const { return height; }
 int Image::getWidth() const { return width; }
 
 Image Image::slice(int startRow, int endRow) {
+  if (startRow < 0)
+    throw std::invalid_argument("startRow must be >= 0");
+  if (endRow > height)
+    throw std::invalid_argument("endRow must be <= image height");
+  if (startRow >= endRow)
+    throw std::invalid_argument("startRow must be < endRow");
+
   int newHeight = endRow - startRow;
   std::vector<float> sliceData(newHeight * width);
   for (int r = startRow; r < endRow; r++) {
@@ -25,6 +33,9 @@ Image Image::slice(int startRow, int endRow) {
 }
 
 Image Image::combine(std::vector<Image> slices) {
+  if (slices.empty())
+    throw std::invalid_argument("Cannot combine an empty list of images");
+
   int totalHeight = 0;
   int width = slices[0].getWidth();
   for (auto &s : slices) totalHeight += s.getHeight();

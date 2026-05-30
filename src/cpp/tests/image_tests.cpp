@@ -5,14 +5,19 @@
 /** Test Cases:
  *
  * Image__Slice__Test:
- * - SliceReturnsCorrectRows: pixel values match the original rows
- * - SliceCorrectDimensions: height = endRow - startRow, width unchanged
- * - SliceSingleRow: slice of one row has height 1
+ * - SliceReturnsCorrectRows [success]: pixel values match the original rows
+ * - SliceCorrectDimensions [success]: height = endRow - startRow, width unchanged
+ * - SliceSingleRow [edge]: slice of one row has height 1
+ * - InvalidStartRowThrows [failure]: negative startRow throws invalid_argument
+ * - EndRowExceedsHeightThrows [failure]: endRow beyond image height throws invalid_argument
+ * - InvertedRangeThrows [failure]: startRow >= endRow throws invalid_argument
  *
  * Image__Combine__Test:
- * - CombineReconstructsFullImage: two slices recombine to original
- * - CombineMultipleSlices: three slices recombine correctly
- * - CombinePreservesOrder: slices appear in the order provided
+ * - CombineReconstructsFullImage [success]: two slices recombine to original
+ * - CombineMultipleSlices [success]: three slices recombine correctly
+ * - CombinePreservesOrder [success]: slices appear in the order provided
+ * - CombineEmptyVectorThrows [failure]: empty slice list throws invalid_argument
+ * - CombineSingleImage [edge]: single-element combine returns image identical to input
  */
 
 // --- Image__Slice__Test ---
@@ -87,4 +92,39 @@ TEST(Image__Combine__Test, CombinePreservesOrder) {
 
   EXPECT_FLOAT_EQ(result.at(0, 0), 1.0f);
   EXPECT_FLOAT_EQ(result.at(1, 0), 3.0f);
+}
+
+TEST(Image__Combine__Test, CombineEmptyVectorThrows) {
+  std::vector<Image> empty;
+  EXPECT_THROW(Image::combine(empty), std::invalid_argument);
+}
+
+TEST(Image__Combine__Test, CombineSingleImage) {
+  Image img(2, 3, {1, 2, 3, 4, 5, 6});
+  Image result = Image::combine({img});
+
+  EXPECT_EQ(result.getHeight(), 2);
+  EXPECT_EQ(result.getWidth(), 3);
+  for (int r = 0; r < 2; r++) {
+    for (int c = 0; c < 3; c++) {
+      EXPECT_FLOAT_EQ(result.at(r, c), img.at(r, c));
+    }
+  }
+}
+
+// --- Image__Slice__Failure__Test ---
+
+TEST(Image__Slice__Test, InvalidStartRowThrows) {
+  Image img(5, 3, std::vector<float>(15, 0.0f));
+  EXPECT_THROW(img.slice(-1, 2), std::invalid_argument);
+}
+
+TEST(Image__Slice__Test, EndRowExceedsHeightThrows) {
+  Image img(5, 3, std::vector<float>(15, 0.0f));
+  EXPECT_THROW(img.slice(0, 99), std::invalid_argument);
+}
+
+TEST(Image__Slice__Test, InvertedRangeThrows) {
+  Image img(5, 3, std::vector<float>(15, 0.0f));
+  EXPECT_THROW(img.slice(3, 1), std::invalid_argument);
 }

@@ -3,36 +3,52 @@
 
 /** Test Cases:
  *
+ * Constructor__Test:
+ * - ZeroCapacityThrows [failure]: capacity 0 throws invalid_argument
+ * - NegativeCapacityThrows [failure]: negative capacity throws invalid_argument
  *
  * push():
- * - empty arr
- * - full arr
- * - float into int arr
- * - positive number
- * - negative number
- * - push when head wraps around
- * - push when tail wraps around
+ * - EmptyBuffer [success]: push to empty buffer stores value correctly
+ * - FullBuffer [success]: push to full buffer overwrites oldest element
+ * - FloatIntoIntBuffer [edge]: float truncated to int on push
+ * - PositiveInt [success]: positive int pushed and peeked correctly
+ * - NegativeInt [success]: negative int pushed and peeked correctly
+ * - HeadWrapAround [success]: head wraps around when buffer is full and overflows
+ * - TailWrapAround [success]: tail wraps around after pop empties and refills buffer
  *
  * pop():
- * - empty arr returns correct nulltpr
- * - full arr returns correct element
- * - pop on tail wrap-around returns correct element
+ * - EmptyBufferReturnsNullopt [edge]: pop on empty buffer returns nullopt
+ * - FullBufferReturnsCorrectElement [success]: pop returns oldest element
+ * - TailWrapAroundReturnsCorrectElement [success]: pop at wrap-around index correct
  *
  * peek():
- * - peek every element of full arr
- * - peek into empty arr
- * - peek at out-of-bounds (negative and over capacity)
+ * - FullBufferAllElements [success]: peek at each index of full buffer
+ * - EmptyBuffer [edge]: peek at index 0 of empty buffer returns a value
+ * - OutOfBounds [failure]: peek at negative or out-of-capacity index returns nullopt
  *
  * moving_average():
- * - empty array
- * - full array
- * - all positive numbers
- * - all negative
- * - positive & negative
- * - arr of size 1
- * - arr of size 10
- * - when elements wrap around
+ * - EmptyBuffer [edge]: average of empty buffer is 0
+ * - FullBuffer [success]: average of full buffer is correct
+ * - AllPositive [success]: average of all positive elements
+ * - AllNegative [success]: average of all negative elements
+ * - PositiveAndNegative [success]: average of mixed positive/negative elements
+ * - SingleElement [edge]: average of single-element buffer is that element
+ * - TenElements [success]: average over 10 elements (integer division)
+ * - ElementsWrapAround [success]: average computed correctly after overwrite wrap
+ * - PartiallyFilled [edge]: average over only filled portion of buffer
  */
+
+// --- Constructor__Test ---
+
+TEST(Constructor__Test, ZeroCapacityThrows) {
+  EXPECT_THROW(RingBuffer<int>(0), std::invalid_argument);
+}
+
+TEST(Constructor__Test, NegativeCapacityThrows) {
+  EXPECT_THROW(RingBuffer<int>(-3), std::invalid_argument);
+}
+
+// --- Push__Test ---
 
 TEST(Push__Test, EmptyBuffer) {
   RingBuffer<int> buffer(5);
@@ -266,4 +282,15 @@ TEST(MovingAverage__Test, ElementsWrapAround) {
   buffer.push(4); // overwrites 1; logical contents: [2, 3, 4]
 
   EXPECT_EQ(buffer.moving_average(), 3); // 9 / 3
+}
+
+TEST(MovingAverage__Test, PartiallyFilled) {
+  // buffer capacity 5, only 3 elements pushed — average over 3, not 5
+  RingBuffer<int> buffer(5);
+
+  buffer.push(10);
+  buffer.push(20);
+  buffer.push(30);
+
+  EXPECT_EQ(buffer.moving_average(), 20); // 60 / 3
 }

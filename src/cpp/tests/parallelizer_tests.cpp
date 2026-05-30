@@ -1,5 +1,6 @@
 #include "../main/parallelizer.h"
 #include "../main/filters/gaussian.h"
+#include "../main/filters/intensity_normalization.h"
 #include "../main/filters/sobel_edge_detection.h"
 #include <gtest/gtest.h>
 #include <memory>
@@ -9,13 +10,15 @@
 /** Test Cases:
  *
  * Parallelizer__Test:
- * - OutputDimensionsMatch: result has same height/width as input
- * - FlatImageUnchanged: flat image through GaussianBlur stays flat
- * - SameResultAsSequential: parallel GaussianBlur matches sequential
- * - SingleRowImage: 1-row image doesn't crash, returns valid result
- * - NonDivisibleHeight: height not evenly divisible by thread count produces
+ * - OutputDimensionsMatch [success]: result has same height/width as input
+ * - FlatImageUnchanged [success]: flat image through GaussianBlur stays flat
+ * - SameResultAsSequential [success]: parallel GaussianBlur matches sequential
+ * - SingleRowImage [edge]: 1-row image doesn't crash, returns valid result
+ * - NonDivisibleHeight [edge]: height not evenly divisible by thread count produces
  *   correct total height and correct pixel values
- * - SeamRowAccuracy: pixel values at strip boundary rows match sequential
+ * - SeamRowAccuracy [edge]: pixel values at strip boundary rows match sequential
+ * - IntensityNormalizationMatchesSequential [success]: parallel pipeline with
+ *   IntensityNormalization matches sequential, verifying prepare() global min/max
  */
 
 static std::vector<std::unique_ptr<Filter>> make_gaussian_filters() {
@@ -139,4 +142,30 @@ TEST(Parallelizer__Test, SingleRowImage) {
     EXPECT_EQ(result.getHeight(), 1);
     EXPECT_EQ(result.getWidth(), 4);
   });
+}
+
+TEST(Parallelizer__Test, IntensityNormalizationMatchesSequential) {
+  // build a gradient image with a wide range so normalization is non-trivial
+  std::vector<float> pixels;
+  for (int i = 0; i < 8 * 6; i++) pixels.push_back(static_cast<float>(i * 4));
+  Image img(8, 6, pixels);
+
+  // sequential: apply intensity normalization directly
+  IntensityNormalization seqFilter;
+  Image seq = seqFilter.apply(img);
+
+  // parallel: IntensityNormalization via Parallelizer (prepare() called first)
+  std::vector<std::unique_ptr<Filter>> parFilters;
+  parFilters.push_back(std::make_unique<IntensityNormalization>());
+  Parallelizer p(parFilters, img);
+  Image par = p.execute();
+
+  EXPECT_EQ(par.getHeight(), seq.getHeight());
+  EXPECT_EQ(par.getWidth(), seq.getWidth());
+  for (int r = 0; r < 8; r++) {
+    for (int c = 0; c < 6; c++) {
+      EXPECT_FLOAT_EQ(par.at(r, c), seq.at(r, c))
+          << "mismatch at row=" << r << " col=" << c;
+    }
+  }
 }

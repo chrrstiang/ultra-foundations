@@ -7,11 +7,12 @@
 /** Test Cases:
  *
  * PGMWriter__Test:
- * - CreatesFile: write() produces a file at the given path
- * - InvalidPath: write() to a bad path throws runtime_error
- * - CorrectHeader: written file has valid P5 header with correct dimensions
- * - PixelValuesRoundTrip: pixel data written and re-parsed matches original
- * - SinglePixel: 1x1 image writes and reads back correctly
+ * - CreatesFile [success]: write() produces a file at the given path
+ * - InvalidPath [failure]: write() to a bad path throws runtime_error
+ * - CorrectHeader [success]: written file has valid P5 header with correct dimensions
+ * - PixelValuesRoundTrip [success]: pixel data written and re-parsed matches original
+ * - SinglePixel [success]: 1x1 image writes and reads back correctly
+ * - PixelOverflowTruncates [edge]: float value > 255 truncates via unsigned char cast
  */
 
 // --- PGMWriter__Test ---
@@ -72,4 +73,23 @@ TEST(PGMWriter__Test, CorrectHeader) {
   EXPECT_EQ(width, 5);
   EXPECT_EQ(height, 3);
   EXPECT_EQ(maxval, "255");
+}
+
+TEST(PGMWriter__Test, PixelOverflowTruncates) {
+  // 300.0f cast to unsigned char wraps: 300 % 256 = 44
+  // this documents and verifies the truncation behavior for out-of-range pixels
+  Image img(1, 1, {300.0f});
+  PGMWriter writer(img);
+  writer.write("/tmp/pgmwriter_overflow.pgm");
+
+  std::ifstream f("/tmp/pgmwriter_overflow.pgm", std::ios::binary);
+  std::string magic;
+  int w, h, maxval;
+  f >> magic >> w >> h >> maxval;
+  f.ignore(1); // skip the newline after maxval
+
+  unsigned char byte = 0;
+  f.read(reinterpret_cast<char *>(&byte), 1);
+  // 300 % 256 = 44: cast through int first to get well-defined truncation
+  EXPECT_EQ(byte, static_cast<unsigned char>(static_cast<int>(300.0f))); // 44
 }
