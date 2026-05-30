@@ -1,5 +1,9 @@
 #include "intensity_normalization.h"
 
+/**
+ * Uses the minimum and maximum intensity values of the
+ * image to average out the pixel intensities of the image.
+ */
 Image IntensityNormalization::apply(Image image) {
   float min = image.at(0, 0);
   float max = image.at(0, 0);
@@ -7,12 +11,15 @@ Image IntensityNormalization::apply(Image image) {
   for (int r = 0; r < image.getHeight(); r++) {
     for (int c = 0; c < image.getWidth(); c++) {
       float val = image.at(r, c);
-      if (val < min) min = val;
-      if (val > max) max = val;
+      if (val < min)
+        min = val;
+      if (val > max)
+        max = val;
     }
   }
 
-  if (min == max) return image;
+  if (min == max)
+    return image;
 
   for (int r = 0; r < image.getHeight(); r++) {
     for (int c = 0; c < image.getWidth(); c++) {
