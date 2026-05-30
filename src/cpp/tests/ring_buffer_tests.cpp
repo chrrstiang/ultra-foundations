@@ -1,4 +1,4 @@
-#include "../main/ring_buffer.cpp"
+#include "../main/ring_buffer.h"
 #include <gtest/gtest.h>
 
 /** Test Cases:

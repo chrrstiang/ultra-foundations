@@ -8,3 +8,7 @@ float Image::at(int row, int col) { return pixelData[row * width + col]; }
 void Image::set(float value, int row, int col) {
   pixelData[row * width + col] = value;
 }
+
+int Image::getHeight() { return height; }
+
+int Image::getWidth() { return width; }

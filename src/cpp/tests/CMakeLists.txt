@@ -9,7 +9,11 @@ target_link_libraries(ring_buffer_tests
 include(GoogleTest)
 gtest_discover_tests(ring_buffer_tests)
 
-add_executable(pgm_parser_tests pgm_parser_tests.cpp)
+add_executable(pgm_parser_tests
+  pgm_parser_tests.cpp
+  ../main/pgm_parser.cpp
+  ../main/image.cpp
+)
 
 target_include_directories(pgm_parser_tests PRIVATE ${CMAKE_SOURCE_DIR})
 
@@ -18,3 +22,18 @@ target_link_libraries(pgm_parser_tests
 )
 
 gtest_discover_tests(pgm_parser_tests)
+
+add_executable(intensity_normalization_tests
+  intensity_normalization_tests.cpp
+  ../main/filters/intensity_normalization.cpp
+  ../main/filters/filter.cpp
+  ../main/image.cpp
+)
+
+target_include_directories(intensity_normalization_tests PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(intensity_normalization_tests
+  GTest::gtest_main
+)
+
+gtest_discover_tests(intensity_normalization_tests)
