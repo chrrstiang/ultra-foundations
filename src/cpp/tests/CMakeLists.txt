@@ -67,3 +67,18 @@ target_link_libraries(sobel_edge_detection_tests
 )
 
 gtest_discover_tests(sobel_edge_detection_tests)
+
+add_executable(pgm_writer_tests
+  pgm_writer_tests.cpp
+  ../main/pgm_writer.cpp
+  ../main/pgm_parser.cpp
+  ../main/image.cpp
+)
+
+target_include_directories(pgm_writer_tests PRIVATE ${CMAKE_SOURCE_DIR})
+
+target_link_libraries(pgm_writer_tests
+  GTest::gtest_main
+)
+
+gtest_discover_tests(pgm_writer_tests)
