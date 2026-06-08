@@ -26,5 +26,27 @@ add_executable(ultra-foundations
 
 target_include_directories(ultra-foundations PRIVATE src/cpp/main)
 
+find_package(JNI REQUIRED)
+
+add_library(imageFilterLib SHARED
+  src/cpp/main/NativeFilterBridge.cpp
+  src/cpp/main/image/image.cpp
+  src/cpp/main/parser/pgm_parser.cpp
+  src/cpp/main/writer/pgm_writer.cpp
+  src/cpp/main/pipeline/filter_pipeline.cpp
+  src/cpp/main/filters/filter.cpp
+  src/cpp/main/filters/gaussian.cpp
+  src/cpp/main/filters/sobel_edge_detection.cpp
+  src/cpp/main/filters/intensity_normalization.cpp
+  src/cpp/main/parallelizer/parallelizer.cpp
+)
+
+target_include_directories(imageFilterLib PRIVATE
+  src/cpp/main
+  ${JNI_INCLUDE_DIRS}
+)
+
+target_link_libraries(imageFilterLib PRIVATE ${JNI_LIBRARIES})
+
 enable_testing()
 add_subdirectory(src/cpp/tests)
