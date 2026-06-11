@@ -1,5 +1,6 @@
 package manager;
 
+import bridge.NativeFilterBridge;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -48,6 +49,22 @@ public class Main {
 
         ScanSession session = new ScanSession(p, new Frame[0], config);
 
+        // filter selection — configure C++ pipeline before scan begins
+        NativeFilterBridge bridge = new NativeFilterBridge();
+        ArrayList<Integer> selectedFilters = new ArrayList<>();
+
+        System.out.print("Apply Gaussian Blur? (y/n): ");
+        if (scanner.nextLine().trim().equals("y")) selectedFilters.add(NativeFilterBridge.FILTER_GAUSSIAN);
+
+        System.out.print("Apply Sobel Edge Detection? (y/n): ");
+        if (scanner.nextLine().trim().equals("y")) selectedFilters.add(NativeFilterBridge.FILTER_SOBEL);
+
+        System.out.print("Apply Intensity Normalization? (y/n): ");
+        if (scanner.nextLine().trim().equals("y")) selectedFilters.add(NativeFilterBridge.FILTER_NORMALIZE);
+
+        int[] filterIds = selectedFilters.stream().mapToInt(Integer::intValue).toArray();
+        bridge.configureFilters(filterIds);
+
         // wait for Enter to start
         System.out.println("Press Enter to start the scan...");
         scanner.nextLine();
@@ -70,8 +87,11 @@ public class Main {
                 CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
                 for (CompletableFuture<Frame> fut : futures) {
                     try {
-                        session.addFrame(fut.get());
-                    } catch (CancellationException | InterruptedException | ExecutionException e) {
+                        Frame raw = fut.get();
+                        float[] filtered = bridge.processImage(raw.pixelData);
+                        session.addFrame(new Frame(filtered, raw.index));
+                    } catch (IllegalStateException | InterruptedException |
+                             ExecutionException e) {
                         exec.shutdown();
                         return;
                     }

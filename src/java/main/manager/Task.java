@@ -19,6 +19,6 @@ public class Task implements Callable<Frame>, Supplier<Frame> {
 
     @Override
     public Frame get() {
-        return null;
+        return new Frame(arr, index);
     }
 }
