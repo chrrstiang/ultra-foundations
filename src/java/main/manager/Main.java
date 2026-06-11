@@ -1,6 +1,7 @@
 package manager;
 
 import bridge.NativeFilterBridge;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -13,7 +14,7 @@ import java.util.concurrent.*;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
 
         // inputs for Patient creation
         System.out.print("What's your first name? ");

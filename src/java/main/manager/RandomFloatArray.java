@@ -1,19 +1,19 @@
 package manager;
 
-import java.util.Random;
+import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomFloatArray {
     private final float[] data;
 
     public RandomFloatArray(int size) {
         data = new float[size];
-        Random rand = new Random();
         for (int i = 0; i < size; i++) {
-            data[i] = rand.nextFloat();
+            data[i] = ThreadLocalRandom.current().nextFloat();
         }
     }
 
     public float[] getData() {
-        return data;
+        return Arrays.copyOf(data, data.length);
     }
 }

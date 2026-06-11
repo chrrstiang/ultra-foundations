@@ -1,9 +1,9 @@
 #include "filter_pipeline.h"
 #include "../parallelizer/parallelizer.h"
 
-Pipeline::Pipeline() {}
+Pipeline::Pipeline() = default;
 
-Pipeline::~Pipeline() {}
+Pipeline::~Pipeline() = default;
 
 Pipeline &Pipeline::addFilter(std::unique_ptr<Filter> filter) {
   filters.push_back(std::move(filter));
@@ -18,6 +18,6 @@ Image Pipeline::execute(Image current_image) {
 }
 
 Image Pipeline::executeParallel(Image image) {
-  Parallelizer p(filters, image);
+  Parallelizer p(filters, std::move(image));
   return p.execute();
 }

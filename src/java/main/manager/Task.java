@@ -1,5 +1,6 @@
 package manager;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
@@ -8,7 +9,7 @@ public class Task implements Callable<Frame>, Supplier<Frame> {
     int index;
 
     public Task(float[] arr, int index) {
-        this.arr = arr;
+        this.arr = Arrays.copyOf(arr, arr.length);
         this.index = index;
     }
 

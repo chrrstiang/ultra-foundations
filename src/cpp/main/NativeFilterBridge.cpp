@@ -8,9 +8,9 @@
 #include <memory>
 #include <vector>
 
-static const int FILTER_GAUSSIAN = 0;
-static const int FILTER_SOBEL = 1;
-static const int FILTER_NORMALIZE = 2;
+static constexpr int FILTER_GAUSSIAN = 0;
+static constexpr int FILTER_SOBEL = 1;
+static constexpr int FILTER_NORMALIZE = 2;
 
 static std::unique_ptr<Pipeline> g_pipeline;
 

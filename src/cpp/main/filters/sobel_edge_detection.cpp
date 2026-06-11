@@ -1,4 +1,5 @@
 #include "sobel_edge_detection.h"
+#include <algorithm>
 #include <cmath>
 
 /**
@@ -35,10 +36,9 @@ Image SobelEdgeDetection::apply(Image image) {
         }
       }
 
-      float magnitude = std::sqrt(gx * gx + gy * gy);
+      float magnitude = std::sqrt((gx * gx) + (gy * gy));
       // clamp to [0, 255]
-      if (magnitude > 255.0f)
-        magnitude = 255.0f;
+      magnitude = std::min(magnitude, 255.0f);
       result.set(magnitude, r, c);
     }
   }

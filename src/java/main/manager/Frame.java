@@ -1,6 +1,7 @@
 package manager;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 /**
  * Represents a frame of an image in the imaging sequence of the
@@ -12,7 +13,7 @@ public class Frame {
     int index;
 
     public Frame(float[] pixelData, int index) {
-        this.pixelData = pixelData;
+        this.pixelData = Arrays.copyOf(pixelData, pixelData.length);
         this.timestamp = LocalDateTime.now();
         this.index = index;
     }

@@ -40,7 +40,7 @@ Image PGM_Parser::parse() {
   file >> maxVal;
   file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-  pixelData.resize(width * height);
+  pixelData.resize(static_cast<std::size_t>(width) * height);
 
   if (magic == "P2") {
     for (int i = 0; i < width * height; i++) {
@@ -56,5 +56,5 @@ Image PGM_Parser::parse() {
     }
   }
 
-  return Image(height, width, pixelData);
+  return {height, width, pixelData};
 }

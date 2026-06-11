@@ -43,6 +43,6 @@ int main(int argc, char *argv[]) {
       std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   std::cout << "Done (" << (parallel ? "parallel" : "sequential") << "). "
             << "Output written to " << argv[2] << "\n"
-            << duration.count() << "ms" << std::endl;
+            << duration.count() << "ms\n";
   return 0;
 }

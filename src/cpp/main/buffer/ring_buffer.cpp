@@ -12,9 +12,13 @@
 template <typename T> class RingBuffer {
 
 public:
+  int head = 0;
+  int tail = 0;
+  int count = 0;
+
   // constructor
   RingBuffer(int capacity)
-      : data(new T[capacity]), head(0), tail(0), capacity(capacity), count(0) {
+      : data(new T[capacity]), capacity(capacity) {
     static_assert(std::is_arithmetic_v<T>,
                   "Ring Buffer only supports numerical types.");
 
@@ -24,7 +28,7 @@ public:
   }
 
   // deconstructor (cleans up resources owned by object on deletion)
-  ~RingBuffer() {}
+  ~RingBuffer() = default;
 
   /**
    * Pushes an element of T type into the data array of the RingBuffer.
@@ -48,9 +52,8 @@ public:
     if (wrapAround(head)) {
       head = 0;
       return;
-    } else {
-      head++;
     }
+    head++;
   }
 
   /**
@@ -78,9 +81,8 @@ public:
   std::optional<T> peek(int index) {
     if (index >= 0 && index < capacity) {
       return data[index];
-    } else {
-      return std::nullopt;
     }
+    return std::nullopt;
   }
 
   // is buffer full or not
@@ -114,10 +116,7 @@ public:
 
 private:
   std::unique_ptr<T[]> data;
-  int head;
-  int tail;
   size_t capacity;
-  int count;
   // determines whether the index is about to wrap around to the beginning of
   // the buffer
   bool wrapAround(int index) { return (index + 1) % capacity == 0; }

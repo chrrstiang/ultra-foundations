@@ -12,5 +12,5 @@ public:
 private:
   std::vector<std::unique_ptr<Filter>> &filters;
   Image image;
-  static const int GHOST_ROWS = 1;
+  static constexpr int GHOST_ROWS = 1;
 };

@@ -1,4 +1,5 @@
 #include "intensity_normalization.h"
+#include <algorithm>
 
 /**
  * Uses the minimum and maximum intensity values of the
@@ -15,10 +16,8 @@ void IntensityNormalization::prepare(const Image &image) {
   for (int r = 0; r < image.getHeight(); r++) {
     for (int c = 0; c < image.getWidth(); c++) {
       float val = image.at(r, c);
-      if (val < globalMin)
-        globalMin = val;
-      if (val > globalMax)
-        globalMax = val;
+      globalMin = std::min(globalMin, val);
+      globalMax = std::max(globalMax, val);
     }
   }
 
@@ -33,16 +32,15 @@ Image IntensityNormalization::apply(Image image) {
     for (int r = 0; r < image.getHeight(); r++) {
       for (int c = 0; c < image.getWidth(); c++) {
         float val = image.at(r, c);
-        if (val < min)
-          min = val;
-        if (val > max)
-          max = val;
+        min = std::min(min, val);
+        max = std::max(max, val);
       }
     }
   }
 
-  if (min == max)
+  if (min == max) {
     return image;
+  }
 
   for (int r = 0; r < image.getHeight(); r++) {
     for (int c = 0; c < image.getWidth(); c++) {

@@ -16,12 +16,12 @@
  */
 Parallelizer::Parallelizer(std::vector<std::unique_ptr<Filter>> &filters,
                            Image image)
-    : filters(filters), image(image) {}
+    : filters(filters), image(std::move(image)) {}
 
 Image Parallelizer::execute() {
   int height = image.getHeight();
-  int numStrips = std::min((int)std::thread::hardware_concurrency(), height);
-  if (numStrips < 1) numStrips = 1;
+  int numStrips = std::min(static_cast<int>(std::thread::hardware_concurrency()), height);
+  numStrips = std::max(1, numStrips);
 
   // serial pass: allow each filter to compute global state from the full image
   for (auto &f : filters) {
@@ -37,7 +37,7 @@ Image Parallelizer::execute() {
   for (int i = 0; i < numStrips; i++) {
     int startRow = row;
     int endRow = startRow + baseRows + (i < remainder ? 1 : 0);
-    strips.push_back({startRow, endRow});
+    strips.emplace_back(startRow, endRow);
     row = endRow;
   }
 

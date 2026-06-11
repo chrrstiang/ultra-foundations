@@ -4,51 +4,59 @@
 Image::Image(int height, int width, std::vector<float> pixelData)
     : height(height), width(width), pixelData(std::move(pixelData)) {}
 
-float Image::at(int row, int col) const { return pixelData[row * width + col]; }
+float Image::at(int row, int col) const {
+  return pixelData[(static_cast<std::size_t>(row) * width) + col];
+}
 
 void Image::set(float value, int row, int col) {
-  pixelData[row * width + col] = value;
+  pixelData[(static_cast<std::size_t>(row) * width) + col] = value;
 }
 
 int Image::getHeight() const { return height; }
 
 int Image::getWidth() const { return width; }
 
-Image Image::slice(int startRow, int endRow) {
-  if (startRow < 0)
+Image Image::slice(int startRow, int endRow) const {
+  if (startRow < 0) {
     throw std::invalid_argument("startRow must be >= 0");
-  if (endRow > height)
+  }
+  if (endRow > height) {
     throw std::invalid_argument("endRow must be <= image height");
-  if (startRow >= endRow)
+  }
+  if (startRow >= endRow) {
     throw std::invalid_argument("startRow must be < endRow");
+  }
 
   int newHeight = endRow - startRow;
-  std::vector<float> sliceData(newHeight * width);
+  std::vector<float> sliceData(static_cast<std::size_t>(newHeight) * width);
   for (int r = startRow; r < endRow; r++) {
     for (int c = 0; c < width; c++) {
-      sliceData[(r - startRow) * width + c] = at(r, c);
+      sliceData[(static_cast<std::size_t>(r - startRow) * width) + c] = at(r, c);
     }
   }
-  return Image(newHeight, width, sliceData);
+  return {newHeight, width, sliceData};
 }
 
 Image Image::combine(std::vector<Image> slices) {
-  if (slices.empty())
+  if (slices.empty()) {
     throw std::invalid_argument("Cannot combine an empty list of images");
+  }
 
   int totalHeight = 0;
   int width = slices[0].getWidth();
-  for (auto &s : slices) totalHeight += s.getHeight();
+  for (auto &s : slices) {
+    totalHeight += s.getHeight();
+  }
 
-  std::vector<float> combined(totalHeight * width);
+  std::vector<float> combined(static_cast<std::size_t>(totalHeight) * width);
   int rowOffset = 0;
   for (auto &s : slices) {
     for (int r = 0; r < s.getHeight(); r++) {
       for (int c = 0; c < width; c++) {
-        combined[rowOffset * width + c] = s.at(r, c);
+        combined[(static_cast<std::size_t>(rowOffset) * width) + c] = s.at(r, c);
       }
       rowOffset++;
     }
   }
-  return Image(totalHeight, width, combined);
+  return {totalHeight, width, combined};
 }

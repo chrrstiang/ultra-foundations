@@ -11,5 +11,8 @@ target/
 .idea/encodings.xml
 .idea/jarRepositories.xml
 
+# IDE / language server caches
+.cache/
+
 # macOS
 .DS_Store

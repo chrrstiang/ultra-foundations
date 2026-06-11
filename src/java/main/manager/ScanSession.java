@@ -17,7 +17,7 @@ public class ScanSession {
 
     public ScanSession(Patient p, Frame[] f, ScanConfiguration c) {
         this.patient = p;
-        this.imageSequence = f;
+        this.imageSequence = Arrays.copyOf(f, f.length);
         this.state = State.CREATED;
         this.config = c;
     }
