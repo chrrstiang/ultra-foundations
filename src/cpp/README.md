@@ -1,6 +1,6 @@
 # C++ Image Processing Pipeline
 
-A command-line image processing tool that reads a PGM grayscale image, applies a three-stage filter pipeline, and writes the result back to disk. Supports both sequential and multi-threaded parallel execution.
+A command-line image processing tool that reads a PGM grayscale image, applies a three-stage filter pipeline, and writes the result back to disk. Supports both sequential and multi-threaded parallel execution. Also builds `imageFilterLib`, a JNI shared library that exposes the same filter pipeline to the Java scan session manager.
 
 ## Requirements
 
@@ -13,21 +13,30 @@ A command-line image processing tool that reads a PGM grayscale image, applies a
 Run from the repository root:
 
 ```bash
-cmake -S . -B build
-cmake --build build
+make build-cpp
 ```
 
-The executable is produced at `build/ultra-foundations`.
+This builds two targets:
+- `build/ultra-foundations` — the CLI image processing tool
+- `build/libimageFilterLib.dylib` — the JNI shared library used by the Java scan manager
+
+Or directly with CMake:
+```bash
+cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build build
+```
 
 ## Usage
 
 ```bash
 ./build/ultra-foundations <input.pgm> <output.pgm> [--parallel]
+# or via Makefile:
+make run-pipeline
 ```
 
 | Argument | Description |
 |----------|-------------|
-| `<input.pgm>` | Path to a P5 (binary) PGM grayscale image |
+| `<input.pgm>` | Path to a P2 (ASCII) or P5 (binary) PGM grayscale image |
 | `<output.pgm>` | Path where the processed image will be written |
 | `--parallel` | Optional flag to enable multi-threaded strip-based processing |
 
@@ -42,9 +51,9 @@ Filters are applied in this fixed order:
 
 | Stage | Filter | Description |
 |-------|--------|-------------|
-| 1 | Gaussian Blur | Smooths the image using a 3x3 kernel (weights: 1 2 1 / 2 4 2 / 1 2 1, sum 16) |
-| 2 | Sobel Edge Detection | Computes gradient magnitude using Kx/Ky kernels; highlights edges |
-| 3 | Intensity Normalization | Stretches pixel values to the full [0, 255] range |
+| 1 | Gaussian Blur | Smooths the image using a 3×3 kernel (weights: 1 2 1 / 2 4 2 / 1 2 1, sum 16) |
+| 2 | Sobel Edge Detection | Computes gradient magnitude using Kx/Ky kernels; highlights edges; output clamped to [0, 255] |
+| 3 | Intensity Normalization | Stretches pixel values to the full [0, 255] range using global min/max |
 
 ### Parallel Execution
 
@@ -63,11 +72,24 @@ Parallel execution produced an average **250% performance increase** over sequen
 
 Output is pixel-identical between modes. The serial pre-pass for `IntensityNormalization::prepare()` ensures global min/max is computed from the full image before strips are distributed, so parallelization does not affect result correctness.
 
+## JNI Shared Library
+
+`imageFilterLib` is a second build target that wraps the same filter/image/pipeline infrastructure and exposes it to Java via JNI. It is loaded by `NativeFilterBridge` in the Java scan session manager.
+
+```bash
+make run-bridge    # test the JNI bridge standalone (loads library, processes a 3-element array)
+```
+
+Two JNI methods are exposed:
+- `configureFilters(int[] filterIds)` — sets up the pipeline once; IDs: 0=Gaussian, 1=Sobel, 2=IntensityNorm
+- `processImage(float[] pixels)` — applies the configured pipeline to pixel data and returns the result
+
 ## Running Tests
 
 ```bash
-cmake --build build
-cd build && ctest --output-on-failure
+make test-cpp
+# or directly:
+cmake --build build && cd build && ctest --output-on-failure
 ```
 
 76 tests across 8 test suites covering success, failure, and edge cases.
@@ -77,26 +99,28 @@ cd build && ctest --output-on-failure
 ```
 src/cpp/
 ├── main/
-│   ├── main.cpp              # Entry point — argument parsing, pipeline construction
+│   ├── main.cpp                      # Entry point — argument parsing, pipeline construction
+│   ├── NativeFilterBridge.cpp        # JNI implementation — configureFilters, processImage
+│   ├── bridge_NativeFilterBridge.h   # Auto-generated JNI method signatures
 │   ├── image/
-│   │   ├── image.h           # Image class declaration
-│   │   └── image.cpp         # 2D float matrix; supports slice() and combine() for parallelization
+│   │   ├── image.h                   # Image class declaration
+│   │   └── image.cpp                 # 2D float matrix; supports slice() and combine() for parallelization
 │   ├── filters/
-│   │   ├── filter.h          # Abstract Filter base class (apply, prepare)
+│   │   ├── filter.h                  # Abstract Filter base class (apply, prepare)
 │   │   ├── filter.cpp
-│   │   ├── gaussian.h/cpp    # GaussianBlur filter
+│   │   ├── gaussian.h/cpp            # GaussianBlur filter
 │   │   ├── sobel_edge_detection.h/cpp   # SobelEdgeDetection filter
 │   │   └── intensity_normalization.h/cpp # IntensityNormalization filter
 │   ├── pipeline/
-│   │   ├── filter_pipeline.h/cpp  # Pipeline — composes filters, drives execution
+│   │   └── filter_pipeline.h/cpp     # Pipeline — composes filters, drives execution
 │   ├── parallelizer/
-│   │   ├── parallelizer.h/cpp     # Strips image into rows, runs filters via std::async
+│   │   └── parallelizer.h/cpp        # Strips image into rows, runs filters via std::async
 │   ├── parser/
-│   │   ├── pgm_parser.h/cpp       # Reads P5 PGM files into Image objects
+│   │   └── pgm_parser.h/cpp          # Reads P2/P5 PGM files into Image objects
 │   ├── writer/
-│   │   ├── pgm_writer.h/cpp       # Writes Image objects to P5 PGM files
+│   │   └── pgm_writer.h/cpp          # Writes Image objects to P5 PGM files
 │   └── buffer/
-│       └── ring_buffer.h          # Generic circular buffer template (RingBuffer<T>)
+│       └── ring_buffer.cpp           # Generic circular buffer template (RingBuffer<T>)
 └── tests/
     ├── CMakeLists.txt
     ├── image_tests.cpp
