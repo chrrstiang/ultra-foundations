@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jfloatArray JNICALL Java_bridge_NativeFilterBridge_processImage
   (JNIEnv *, jobject, jfloatArray);
 
+/*
+ * Class:     bridge_NativeFilterBridge
+ * Method:    configureFilters
+ * Signature: ([I)V
+ */
+JNIEXPORT void JNICALL Java_bridge_NativeFilterBridge_configureFilters
+  (JNIEnv *, jobject, jintArray);
+
 #ifdef __cplusplus
 }
 #endif
