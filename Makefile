@@ -26,8 +26,8 @@ test-java:
 	mvn test
 
 # Run targets
-run-scan: build-java
-	java -cp $(JAVA_OUT_DIR) manager.Main
+run-scan: build-cpp build-java
+	java -Djava.library.path=$(CPP_BUILD_DIR) -cp $(JAVA_OUT_DIR) manager.Main
 
 run-bridge: build-cpp build-java
 	java -Djava.library.path=$(CPP_BUILD_DIR) -cp $(JAVA_OUT_DIR) bridge.NativeFilterBridge
